@@ -118,6 +118,34 @@ export class MyMCP extends McpAgent<Env> {
         }
       }
     );
+
+    this.server.tool(
+      "storeValue",
+      "Store a simple key-value pair in Cloudflare KV",
+      {
+        key: z.string().describe("Key to store the value under"),
+        value: z.string().describe("Value to store"),
+      },
+      async ({ key, value }) => {
+        try {
+          await this.env.TODO_STORE.put(key, value);
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: "Value stored successfully",
+              },
+            ],
+          };
+        } catch (error: any) {
+          console.error("Error storing value:", error);
+          throw new Error(
+            `Failed to store value: ${error?.message || "Unknown error"}`
+          );
+        }
+      }
+    );
   }
 }
 

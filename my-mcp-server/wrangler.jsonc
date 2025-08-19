@@ -32,7 +32,13 @@
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	"kv_namespaces": [
+    {
+      "binding": "TODO_STORE",
+      "id": "48fd8a44f3e44e1a9a643584d969f8e4"
+    }
+  ]
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
