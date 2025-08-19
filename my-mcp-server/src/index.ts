@@ -56,20 +56,54 @@ export class MyMCP extends McpAgent {
       }
     );
 
+    // Random number tool
     this.server.tool(
       "randomNumber",
       { startRange: z.number(), endRange: z.number() },
-      async ({ startRange, endRange }) => ({
-        content: [
-          {
-            type: "text",
-            text: String(
-              Math.floor(Math.random() * (endRange - startRange + 1)) +
-                startRange
-            ),
-          },
-        ],
-      })
+      async ({ startRange, endRange }) => {
+        try {
+          // Get true randomness from drand Cloudflare endpoint
+          const response = await fetch(
+            "https://drand.cloudflare.com/public/latest"
+          );
+          const data = (await response.json()) as { randomness: string };
+
+          // Use the randomness value as seed
+          // Take a random 8-character slice from the full randomness string
+          const randomHex = data.randomness;
+          const startIndex = Math.floor(Math.random() * (randomHex.length - 8));
+          const randomValue = parseInt(
+            randomHex.slice(startIndex, startIndex + 8),
+            16
+          );
+
+          // Scale to the requested range
+          const scaledRandom =
+            (Math.abs(randomValue) % (endRange - startRange + 1)) + startRange;
+
+          return {
+            content: [
+              {
+                type: "text",
+                text: String(scaledRandom),
+              },
+            ],
+          };
+        } catch (error) {
+          // Fallback to Math.random if fetch fails
+          return {
+            content: [
+              {
+                type: "text",
+                text: String(
+                  Math.floor(Math.random() * (endRange - startRange + 1)) +
+                    startRange
+                ),
+              },
+            ],
+          };
+        }
+      }
     );
   }
 }
